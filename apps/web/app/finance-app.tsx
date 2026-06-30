@@ -85,7 +85,6 @@ interface Cashflow {
 }
 
 const apiBase = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001/api/v1";
-const today = new Date().toISOString().slice(0, 10);
 
 const currency = new Intl.NumberFormat("pt-BR", {
   style: "currency",
@@ -112,8 +111,9 @@ export function FinanceApp() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
+  const [today, setToday] = useState("");
 
-  const [authForm, setAuthForm] = useState({ name: "Pedro Luiz", email: "pedro@contacomigo.local", password: "123456", kind: "person" });
+  const [authForm, setAuthForm] = useState({ name: "Pedro Luiz", email: "pedro@contacomigo.local", password: "", kind: "person" });
   const [accountForm, setAccountForm] = useState({ name: "Conta Principal", type: "checking" as AccountType });
   const [categoryForm, setCategoryForm] = useState({ name: "Clientes", type: "income" as TransactionType });
   const [transactionForm, setTransactionForm] = useState({
@@ -122,9 +122,9 @@ export function FinanceApp() {
     amount: "2500",
     categoryId: "",
     description: "Recebimento",
-    date: today
+    date: ""
   });
-  const [transferForm, setTransferForm] = useState({ fromAccountId: "", toAccountId: "", amount: "100", description: "Reserva", date: today });
+  const [transferForm, setTransferForm] = useState({ fromAccountId: "", toAccountId: "", amount: "100", description: "Reserva", date: "" });
   const [cardForm, setCardForm] = useState({ name: "Cartao Empresas", limit: "5000", closingDay: "20", dueDay: "10" });
   const [cardTransactionForm, setCardTransactionForm] = useState({
     cardId: "",
@@ -133,8 +133,12 @@ export function FinanceApp() {
     description: "Software",
     installmentCount: "1",
     categoryId: "",
-    date: today
+    date: ""
   });
+
+  useEffect(() => {
+    setToday(new Date().toISOString().slice(0, 10));
+  }, []);
 
   useEffect(() => {
     const stored = window.localStorage.getItem("conta-comigo-session");
@@ -157,6 +161,15 @@ export function FinanceApp() {
     }));
     setCardTransactionForm((current) => ({ ...current, accountId: current.accountId || accounts[0].id }));
   }, [accounts]);
+
+  useEffect(() => {
+    if (!today) {
+      return;
+    }
+    setTransactionForm((current) => ({ ...current, date: current.date || today }));
+    setTransferForm((current) => ({ ...current, date: current.date || today }));
+    setCardTransactionForm((current) => ({ ...current, date: current.date || today }));
+  }, [today]);
 
   useEffect(() => {
     const income = categories.find((category) => category.type === "income");
@@ -261,7 +274,7 @@ export function FinanceApp() {
   }
 
   return (
-    <main className="app-shell">
+    <main className="app-shell" suppressHydrationWarning>
       <header className="topbar">
         <div className="brand">
           <div className="brand-mark">
@@ -293,7 +306,7 @@ export function FinanceApp() {
             </div>
           </div>
 
-          <form className="auth-card" onSubmit={submitAuth}>
+          <form className="auth-card" onSubmit={submitAuth} suppressHydrationWarning>
             <div className="tabs" role="tablist">
               <button type="button" className={`tab ${authMode === "register" ? "active" : ""}`} onClick={() => setAuthMode("register")}>
                 Cadastro
@@ -312,12 +325,27 @@ export function FinanceApp() {
 
             <label>
               E-mail
-              <input type="email" value={authForm.email} onChange={(event) => setAuthForm({ ...authForm, email: event.target.value })} />
+              <input
+                type="email"
+                name="email"
+                autoComplete="email"
+                value={authForm.email}
+                onChange={(event) => setAuthForm({ ...authForm, email: event.target.value })}
+              />
             </label>
 
             <label>
               Senha
-              <input type="password" value={authForm.password} onChange={(event) => setAuthForm({ ...authForm, password: event.target.value })} />
+              <input
+                type="password"
+                name="password"
+                autoComplete="off"
+                data-1p-ignore="true"
+                data-lpignore="true"
+                data-bwignore="true"
+                value={authForm.password}
+                onChange={(event) => setAuthForm({ ...authForm, password: event.target.value })}
+              />
             </label>
 
             {authMode === "register" ? (

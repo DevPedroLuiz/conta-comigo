@@ -8,7 +8,7 @@
     "start": "next start --port 3000",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "lint": "next lint"
-  },
+ },
   "dependencies": {
     "lucide-react": "^0.561.0",
     "next": "^16.2.9",
