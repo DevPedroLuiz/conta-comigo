@@ -1,0 +1,26 @@
+{
+  "name": "conta-comigo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Sistema financeiro inteligente para gestao pessoal e empresarial.",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev -w @conta-comigo/api\" \"npm run dev -w @conta-comigo/web\"",
+    "dev:api": "npm run dev -w @conta-comigo/api",
+    "dev:web": "npm run dev -w @conta-comigo/web",
+    "build": "npm run build -w @conta-comigo/api && npm run build -w @conta-comigo/web",
+    "typecheck": "npm run typecheck -w @conta-comigo/api && npm run typecheck -w @conta-comigo/web",
+    "lint": "npm run lint -w @conta-comigo/web"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@supabase/ssr": "^0.12.0",
+    "@supabase/supabase-js": "^2.110.0"
+  }
+}
